@@ -1,4 +1,4 @@
-## openzl-java
+## Openzl-java
 OpenZL is a lossless data compression framework that provides context awareness unlike zstd, zlib, etc. It uses a composed DAG to create custom compressors for specific data formats.
 
 > These JNI bindings do not access OpenZL's current format-aware compression methods.  
