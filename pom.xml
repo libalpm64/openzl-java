@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.openzl</groupId>
+    <artifactId>openzl-java</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>OpenZL Java</name>
+    <description>Java bindings for OpenZL</description>
+    <url>https://github.com/libalpm64/openzl-java</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.9.2</junit.version>
+        <native.lib.name>openzl_jni</native.lib.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>compile-jni-headers</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>-h</arg>
+                                <arg>${project.build.directory}/native/include</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- CMake compilation plugin - DISABLED since native library is already built -->
+            <!--
+            <plugin>
+                <groupId>com.googlecode.cmake-maven-project</groupId>
+                <artifactId>cmake-maven-plugin</artifactId>
+                <version>3.25.2-b1</version>
+                <executions>
+                    <execution>
+                        <id>cmake-generate</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourcePath>${project.basedir}</sourcePath>
+                            <targetPath>${project.build.directory}/cmake</targetPath>
+                            <generator>MinGW Makefiles</generator>
+                    <options>
+                        <option>-DCMAKE_BUILD_TYPE=${cmake.build.type}</option>
+                        <option>-DCMAKE_INSTALL_PREFIX=${cmake.install.prefix}</option>
+                        <option>-DCMAKE_C_COMPILER=C:/Users/snoop/Downloads/w64devkit/bin/gcc.exe</option>
+                        <option>-DCMAKE_CXX_COMPILER=C:/Users/snoop/Downloads/w64devkit/bin/g++.exe</option>
+                        <option>-DCMAKE_MAKE_PROGRAM=C:/Users/snoop/Downloads/w64devkit/bin/mingw32-make.exe</option>
+                    </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>cmake-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <projectDirectory>${project.build.directory}/cmake</projectDirectory>
+                            <target>openzl_jni</target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>cmake-install</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <projectDirectory>${project.build.directory}/cmake</projectDirectory>
+                            <target>install</target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+            
+            <!-- Copy native libraries to resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-native-libs</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/native</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/native</directory>
+                                    <includes>
+                                        <include>**/*.dll</include>
+                                        <include>**/*.so</include>
+                                        <include>**/*.dylib</include>
+                                        <include>**/openzl_jni.*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.library.path>${project.build.directory}/native</java.library.path>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
