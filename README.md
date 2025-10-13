@@ -44,9 +44,7 @@ cmake -S . -B build \
   -DOPENZL_BUILD_CLI=OFF \
   -DOPENZL_BUILD_EXAMPLES=OFF \
   --fresh
-```
-```sh
+
 cmake --build build --config Release
 ```
-
 For Java, use a compiler like Maven to compile the repo.
